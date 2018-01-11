@@ -9,12 +9,16 @@ const StyledModal = styled(Modal)`
 `;
 
 export default ({show, onClose, response, ...restProps}) => {
+  let parsedResponse = "";
+  if (response) {
+    parsedResponse = JSON.stringify(response.accounts);
+  }
   return (
     <div>
       <StyledModal show={show} onHide={onClose}>
         <Modal.Header>Response is:</Modal.Header>
         <Modal.Body>
-          <div>{response}</div>
+          <div>{parsedResponse}</div>
         </Modal.Body>
         <Modal.Footer>
           <Button onClick={onClose}>Close</Button>

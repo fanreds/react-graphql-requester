@@ -56,11 +56,11 @@ class Requester extends React.PureComponent {
     return (
       <Wrapper>
         <div>
-          <textarea rows={10} cols={60} value={this.state.inputValue} onChange={this.handleChange}/>
+          <textarea disabled rows={10} cols={60} value={this.state.inputValue} onChange={this.handleChange}/>
         </div>
         <Button bsStyle="success" onClick={this.sendRequest}>SEE ANSWER</Button>
         <ResponseModal show={this.state.showModal} onClose={this.handleClose}
-                       response={'successful answer'}/>
+                       response={data.accounts ? data.accounts : data.errors}/>
       </Wrapper>
     )
   }
