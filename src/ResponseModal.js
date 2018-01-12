@@ -11,7 +11,7 @@ const StyledModal = styled(Modal)`
 export default ({show, onClose, response, ...restProps}) => {
   let parsedResponse = "";
   if (response) {
-    parsedResponse = JSON.stringify(response.accounts);
+    parsedResponse = JSON.stringify(response);
   }
   return (
     <div>

@@ -3,15 +3,18 @@ import {Button} from 'react-bootstrap';
 import styled from 'styled-components';
 import ResponseModal from './ResponseModal'
 import gql from "graphql-tag"
-import {graphql} from 'react-apollo';
+import {withApollo} from 'react-apollo';
 
 const Wrapper = styled.div`
   textarea {
     overflow: hidden;
   }
+  > button {
+    margin-right:5px;
+  }
 `;
 
-const query = gql`query getAccounts {
+const getAccountQuery = `query getAccounts {
       accounts {
         accounts {
           companyName
@@ -24,25 +27,62 @@ const query = gql`query getAccounts {
       }    
     }`;
 
+const getSmsOperatorsQuery = `query getSmsOperators {
+      smsOperators {
+        smsOperators {
+          id      
+          operator
+          network
+        }
+        errors {     
+          message    
+        }
+      }    
+    }`;
+
 class Requester extends React.PureComponent {
 
   state = {
-    inputValue: 'query accounts {\n' +
-    '    accounts {\n' +
-    '      companyName\n' +
-    '      id' +
-    '      idAccount\n' +
-    '    }' +
-    '    errors{' +
-    '     message' +
-    '    }\n' +
-    '  }',
-    showModal: false
+    inputValue: `query getSmsOperators {
+      smsOperators {
+        smsOperators {
+          id      
+          operator
+          network
+        }
+        errors {     
+          message    
+        }
+      }    
+    }`,
+    showModal: false,
+    answer: ""
   };
 
-  sendRequest = () => {
+  sendRequest = (query, resolver, responseKey) => {
+    this.setState({inputValue: query});
+    this.props.client.query({
+      query: gql`${query}`,
+      context: {
+        headers: {
+          "graphql-resolver": resolver
+        }
+      }
+    }).then(response => {
+      this.setState({answer: response.data[responseKey][responseKey]});
+    });
+
     this.setState({showModal: true});
   };
+
+  getAccountsRequest = () => {
+    this.sendRequest(getAccountQuery, "com.clx.bossbe.graphql.account.resolver.RootQueryResolver", "accounts")
+  };
+
+  getSmsOperatorsRequest = () => {
+    this.sendRequest(getSmsOperatorsQuery, "com.clx.bossbe.graphql.smsoperator.resolver.RootQueryResolver", "smsOperators")
+  };
+
   handleChange = (evt) => {
     this.setState({inputValue: evt.target.value});
   };
@@ -58,12 +98,13 @@ class Requester extends React.PureComponent {
         <div>
           <textarea disabled rows={10} cols={60} value={this.state.inputValue} onChange={this.handleChange}/>
         </div>
-        <Button bsStyle="success" onClick={this.sendRequest}>SEE ANSWER</Button>
-        <ResponseModal show={this.state.showModal} onClose={this.handleClose}
-                       response={data.accounts ? data.accounts : data.errors}/>
+        <Button bsStyle="success" onClick={this.getAccountsRequest}>get accounts</Button>
+        <Button bsStyle="success" onClick={this.getSmsOperatorsRequest}>get sms operators</Button>
+        <ResponseModal show={this.state.showModal} onClose={this.handleClose} response={this.state.answer}
+        />
       </Wrapper>
     )
   }
 }
 
-export default graphql(query)(Requester);
+export default withApollo(Requester);

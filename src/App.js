@@ -7,7 +7,7 @@ import { ApolloProvider } from 'react-apollo';
 import './App.css';
 import Requester from './Requester'
 const client = new ApolloClient({
-  link: new HttpLink({ uri: '/graphql/account' }),
+  link: new HttpLink({ uri: '/graphql' }),
   cache: new InMemoryCache().restore(window.__APOLLO_STATE__),
 });
 class App extends Component {
